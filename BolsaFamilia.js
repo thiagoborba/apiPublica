@@ -1,3 +1,7 @@
+  //http://www.transparencia.gov.br/swagger-ui.html#/Bolsa32Fam237lia
+  //API REST do Portal da Transparência do Governo Federal
+  //API de serviços do Portal da Transparência do Governo Federal
+
 const fetch = require('node-fetch')
 const moment = require('moment')
 
@@ -12,12 +16,13 @@ class Importer {
     return `http://www.transparencia.gov.br/api-de-dados/bolsa-familia-por-municipio?mesAno=${year}${month}&codigoIbge=${ibgeCode}&pagina=1`
   }
 
-  async fetchAll () {
-    return this.ibgeCodes.map(async (ibgeCode) => {
-      const ibgeCodeData = await this.fetchIbgeCodeData(ibgeCode)
+  async fetch (url) {
+    console.log('loading url', url)
+    const res = await fetch(url)
+    const json = await res.json()
 
-      return ibgeCodeData
-    })
+    console.log('response', json)
+    return json
   }
 
   async fetchIbgeCodeData (ibgeCode) {
@@ -34,17 +39,15 @@ class Importer {
 
       currentDate = currentDate.add(1, 'month')
     }
-
     return results
   }
 
-  async fetch (url) {
-    console.log('loading url', url)
-    const res = await fetch(url)
-    const json = await res.json()
+  async fetchAll () {
+    return this.ibgeCodes.map(async (ibgeCode) => {
+      const ibgeCodeData = await this.fetchIbgeCodeData(ibgeCode)
 
-    console.log('response', json)
-    return json
+      return ibgeCodeData
+    })
   }
 }
 
