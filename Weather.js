@@ -1,19 +1,24 @@
-const app = require('express')();
-const fetch = require('node-fetch');
+//https://api.hgbrasil.com/weather/?format=json&woeid=455903
+const fetch = require('node-fetch')
+const RecurringImporter = require('./RecurringImporter')
+const BaseImporter = require('./BaseImporter')
 
-const fetchData = async () => {
+class Importer extends BaseImporter {
+  constructor(...woeid) {
+    super()
 
-  await fetch('https://api.hgbrasil.com/weather/?format=json&woeid=455903')
-    .then(data => data.json())
-    .then(json => console.log(json))
-};
+    this.woeid = woeid;
+  }
 
-app.get('/', (req, res) => {
+  buildUrl(){
+    return `https://api.hgbrasil.com/weather/?format=json&woeid=${this.woeid}`
+  }
 
-})
+  async import(){
+    const results = await this.fetch(this.buildUrl())
+    return results
+  }
+}
 
-app.listen(3000, () => {
-
-  console.log('servidor rodando')
-})
-
+const importer = new RecurringImporter(new Importer(455903), 10000)
+importer.start()
